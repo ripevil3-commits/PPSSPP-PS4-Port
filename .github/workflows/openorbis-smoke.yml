@@ -1,4 +1,4 @@
-name: OpenOrbis smoke build
+name: OpenOrbis sample smoke build
 
 on:
   push:
@@ -10,76 +10,33 @@ permissions:
 
 jobs:
   build-sample:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Check out porting repository
+      - name: Check out this project
         uses: actions/checkout@v4
 
-      - name: Install host build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang lld make jq unzip curl
+      - name: Fetch the upstream OpenOrbis sample source
+        run: git clone --depth 1 https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git _openorbis-toolchain
 
-      - name: Download the latest OpenOrbis Linux toolchain release
-        shell: bash
-        run: |
-          set -euo pipefail
-          release_json="$(curl -fsSL https://api.github.com/repos/OpenOrbis/OpenOrbis-PS4-Toolchain/releases/latest)"
-          asset_url="$(printf '%s' "$release_json" | jq -r '[.assets[] | select(.name | ascii_downcase | endswith(".zip")) | select(.name | ascii_downcase | contains("linux"))][0].browser_download_url // empty')"
-          if [ -z "$asset_url" ]; then
-            asset_url="$(printf '%s' "$release_json" | jq -r '[.assets[] | select(.name | ascii_downcase | endswith(".zip"))][0].browser_download_url // empty')"
-          fi
-          if [ -z "$asset_url" ]; then
-            echo "No ZIP release asset was found for OpenOrbis." >&2
-            printf '%s\n' "$release_json" | jq -r '.assets[].name' >&2
-            exit 1
-          fi
-          echo "Downloading release asset: $asset_url"
-          curl -fL "$asset_url" -o "$RUNNER_TEMP/openorbis.zip"
-          mkdir -p "$RUNNER_TEMP/openorbis"
-          unzip -q "$RUNNER_TEMP/openorbis.zip" -d "$RUNNER_TEMP/openorbis"
-          toolchain_root="$(find "$RUNNER_TEMP/openorbis" -type f -path '*/bin/linux/create-fself' -printf '%h\n' | head -n1 | sed 's#/bin/linux$##')"
-          if [ -z "$toolchain_root" ]; then
-            echo "Could not find bin/linux/create-fself in the downloaded release." >&2
-            find "$RUNNER_TEMP/openorbis" -maxdepth 4 -type f | head -80 >&2
-            exit 1
-          fi
-          echo "OO_PS4_TOOLCHAIN=$toolchain_root" >> "$GITHUB_ENV"
-          echo "$toolchain_root/bin/linux" >> "$GITHUB_PATH"
-          echo "Detected toolchain root: $toolchain_root"
+      - name: Build and package the upstream SDL2 sample with OpenOrbis
+        uses: OpenOrbis/toolchain-action@main
+        with:
+          version: v0.5.4
+          command: |
+            cd _openorbis-toolchain/samples/SDL2
+            make clean
+            make
 
-      - name: Verify compiler and sample layout
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f "$OO_PS4_TOOLCHAIN/link.x"
-          test -f "$OO_PS4_TOOLCHAIN/lib/crt1.o"
-          command -v clang
-          command -v clang++
-          command -v ld.lld
-          sample_makefile="$(find "$OO_PS4_TOOLCHAIN" -path '*/samples/SDL2/Makefile' -print -quit)"
-          if [ -z "$sample_makefile" ]; then
-            echo "OpenOrbis release does not contain the SDL2 sample Makefile." >&2
-            exit 1
-          fi
-          echo "SAMPLE_DIR=$(dirname "$sample_makefile")" >> "$GITHUB_ENV"
-
-      - name: Compile and link OpenOrbis SDL2 sample
-        shell: bash
-        run: |
-          set -euo pipefail
-          make -C "$SAMPLE_DIR" clean
-          make -C "$SAMPLE_DIR" eboot.bin
-
-      - name: Upload smoke-build outputs
+      - name: Upload sample build outputs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: openorbis-smoke-build
+          name: openorbis-sdl2-smoke-build
           path: |
-            ${{ runner.temp }}/openorbis/**/*.elf
-            ${{ runner.temp }}/openorbis/**/*.oelf
-            ${{ runner.temp }}/openorbis/**/*.bin
+            _openorbis-toolchain/samples/SDL2/eboot.bin
+            _openorbis-toolchain/samples/SDL2/*.pkg
+            _openorbis-toolchain/samples/SDL2/x64/Debug/*.elf
+            _openorbis-toolchain/samples/SDL2/x64/Debug/*.oelf
           if-no-files-found: warn
           retention-days: 7
