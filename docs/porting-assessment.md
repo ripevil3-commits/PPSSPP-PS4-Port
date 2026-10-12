@@ -12,7 +12,7 @@
 3. PPSSPP includes OpenGL/GLES and Vulkan graphics paths, but its source tree does not provide a ready-made PS4 target.
 4. The OpenOrbis sample Makefile targets `x86_64-pc-freebsd12-elf`, links PS4 system stubs, and normally uses `create-fself` and packaging tools.
 5. The hosted OpenOrbis container previously compiled and linked the upstream sample, but the container did not include `create-fself`. Packaging has therefore not been demonstrated.
-6. The repository now has a small project-owned SDL2 probe at `ps4-smoke/main.cpp`. Its CI job replaces the sample's main source and attempts a compile/link-only build. This validates only the probe's build path, not the emulator or runtime behavior.
+6. The repository now has a small project-owned SDL2 probe at `ps4-smoke/main.cpp`. GitHub Actions run #18 passed its compile/link-only build. This validates only the probe's build path, not the emulator or runtime behavior.
 
 ## Proposed engineering sequence
 
@@ -20,7 +20,7 @@
 
 - [x] Establish a successful OpenOrbis compile/link smoke test.
 - [x] Add a project-owned SDL2 probe source.
-- [ ] Confirm the new project-owned probe passes in CI.
+- [x] Confirm the project-owned SDL2 probe passes in CI (run #18, commit `b0403476d93fb2fc4bf779ac6086e8ad330044a2`).
 - [ ] Find a reproducible, compatible ELF-to-SELF/PKG packaging toolchain.
 - [ ] Validate execution on compatible PS4 hardware.
 
