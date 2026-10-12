@@ -7,28 +7,31 @@ Last updated: 2026-10-13
 This repository is an experimental porting investigation. It is not an official PPSSPP release and does not yet contain a working PS4 build.
 
 - [x] Create a project repository.
-- [x] Add a GitHub Actions workflow using the official OpenOrbis toolchain action to attempt an upstream SDL2 sample build and package.
-- [x] Record an initial source audit and technical milestones.
-- [ ] Verify the latest GitHub Actions run and fix any environment/sample issues.
-- [ ] Build a minimal project-owned PS4 application independent of PPSSPP.
-- [ ] Confirm packaging and inspect the generated artifact.
+- [x] Add an OpenOrbis CI smoke build.
+- [x] Confirm that the OpenOrbis container can compile and link a PS4 ELF.
+- [x] Add a project-owned minimal SDL2 probe source.
+- [ ] Confirm the latest CI run compiles and links the project-owned probe.
+- [ ] Restore packaging tools or provide a supported packaging environment for SELF/PKG generation.
+- [ ] Validate the probe on a compatible PS4.
 - [ ] Map PPSSPP's platform services to available PS4 APIs/libraries.
 - [ ] Select and validate a graphics path before attempting the full emulator.
 - [ ] Investigate audio, controller input, filesystem, threading, JIT/code generation, and third-party dependencies.
 - [ ] Produce and test a PPSSPP-derived package on compatible hardware.
 
-## Important distinction
+## Current CI milestone
 
-The smoke workflow is only an upstream OpenOrbis SDL2 sample check. It is not a PPSSPP build, and a successful sample build does not demonstrate that PPSSPP itself builds or runs. The workflow must finish successfully and its artifact must be inspected before the toolchain is considered validated.
+The workflow builds `ps4-smoke/main.cpp`, a small SDL2 program maintained in this repository, using the OpenOrbis sample's compiler and link configuration. It checks for a linked ELF and uploads it as a short-lived Actions artifact.
 
-## Why the port is non-trivial
+This is a **compile/link probe only**. It does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
 
-PPSSPP is a large cross-platform C++ project. A PS4 port needs more than changing compiler flags: platform services, rendering, audio, controller input, filesystem behavior, generated machine code/JIT behavior, threading, and third-party dependencies all need to be evaluated. The existing source archives are useful references but do not by themselves provide a ready-to-build PS4 target.
+## Why the full port is non-trivial
+
+PPSSPP is a large cross-platform C++ project. A PS4 port needs more than changing compiler flags: platform services, rendering, audio, controller input, filesystem behavior, generated machine code/JIT behavior, threading, and third-party dependencies all need to be evaluated. The existing source archives do not provide a ready-to-build PS4 target.
 
 ## Source projects
 
 - PPSSPP: https://github.com/hrydgard/ppsspp
 - OpenOrbis PS4 Toolchain: https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain
-- Official OpenOrbis GitHub Actions helper: https://github.com/OpenOrbis/toolchain-action
+- OpenOrbis GitHub Actions helper: https://github.com/OpenOrbis/toolchain-action
 
 Respect upstream licenses and third-party notices when importing or modifying code.
