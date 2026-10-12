@@ -22,16 +22,21 @@ jobs:
       - name: Allow the container to write build outputs
         run: chmod -R a+rwX _openorbis-toolchain
 
-      - name: Build and package the upstream SDL2 sample with the official OpenOrbis container
+      - name: Compile and link the upstream SDL2 sample with the official OpenOrbis container
         run: |
           # The current sample uses a sysmodule enum absent from the container's SDK headers.
           # Keep the documented PS4 module ID (0x009A) while building against that SDK.
           sed -i 's/ORBIS_SYSMODULE_FREETYPE_OL/0x009A/g' _openorbis-toolchain/samples/SDL2/SDL2/main.cpp
+          # The published container image lacks create-fself, so test compilation/linking only.
+          printf '\nsmoke-elf: $(OBJS)\n\t$(LD) $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)\n' >> _openorbis-toolchain/samples/SDL2/Makefile
           docker run --rm \
             --volume "${{ github.workspace }}/_openorbis-toolchain:/workspace" \
             --workdir /workspace/samples/SDL2 \
             openorbisofficial/toolchain:latest \
-            bash -lc 'make clean && make'
+            bash -lc 'make clean && make smoke-elf'
+
+      - name: Verify linked PS4 ELF exists
+        run: test -s _openorbis-toolchain/samples/SDL2/SDL2/x64/Debug/SDL2.elf
 
       - name: Upload sample build outputs
         if: always()
