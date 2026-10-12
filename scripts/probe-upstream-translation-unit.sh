@@ -15,7 +15,7 @@ docker run --rm \
   --volume "$PWD/$toolchain:/workspace" \
   --workdir /workspace/samples/SDL2 \
   openorbisofficial/toolchain:latest \
-  bash -lc 'clang++ --target=x86_64-pc-freebsd12-elf -std=c++17 -fPIC -fsyntax-only -isysroot "$OO_PS4_TOOLCHAIN" -isystem "$OO_PS4_TOOLCHAIN/include" -isystem "$OO_PS4_TOOLCHAIN/include/c++/v1" -I/ppsspp -I/ppsspp/Common /ppsspp/Common/Log/LogManager.cpp' 2>&1 | tee "$log"
+  bash -lc 'clang++ --target=x86_64-pc-freebsd12-elf -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -std=c++17 -fPIC -fsyntax-only -isysroot "$OO_PS4_TOOLCHAIN" -isystem "$OO_PS4_TOOLCHAIN/include" -isystem "$OO_PS4_TOOLCHAIN/include/c++/v1" -I/ppsspp -I/ppsspp/Common /ppsspp/Common/Log/LogManager.cpp' 2>&1 | tee "$log"
 result=${PIPESTATUS[0]}
 set -e
 if [[ "$result" -eq 0 ]]; then
