@@ -1,4 +1,4 @@
-name: OpenOrbis sample smoke build
+name: OpenOrbis project probe build
 
 on:
   push:
@@ -9,25 +9,25 @@ permissions:
   contents: read
 
 jobs:
-  build-sample:
+  build-probe:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Check out this project
         uses: actions/checkout@v4
 
-      - name: Fetch the upstream OpenOrbis sample source
+      - name: Fetch the upstream OpenOrbis SDL2 build environment
         run: git clone --depth 1 https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git _openorbis-toolchain
 
       - name: Allow the container to write build outputs
         run: chmod -R a+rwX _openorbis-toolchain
 
-      - name: Compile and link the upstream SDL2 sample with the official OpenOrbis container
+      - name: Build this repository's SDL2 probe with the OpenOrbis container
         run: |
-          # The current sample uses a sysmodule enum absent from the container's SDK headers.
-          # Keep the documented PS4 module ID (0x009A) while building against that SDK.
-          sed -i 's/ORBIS_SYSMODULE_FREETYPE_OL/0x009A/g' _openorbis-toolchain/samples/SDL2/SDL2/main.cpp
-          # The published container image lacks create-fself, so test compilation/linking only.
+          # Use our own minimal source rather than the upstream game sample.
+          cp ps4-smoke/main.cpp _openorbis-toolchain/samples/SDL2/SDL2/main.cpp
+          find _openorbis-toolchain/samples/SDL2/SDL2 -maxdepth 1 -type f -name '*.cpp' ! -name main.cpp -delete
+          # The published container image lacks create-fself; this is compile/link only.
           printf '\nsmoke-elf: $(OBJS)\n\t$(LD) $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)\n' >> _openorbis-toolchain/samples/SDL2/Makefile
           docker run --rm \
             --volume "${{ github.workspace }}/_openorbis-toolchain:/workspace" \
@@ -38,12 +38,11 @@ jobs:
       - name: Verify linked PS4 ELF exists
         run: test -s _openorbis-toolchain/samples/SDL2/SDL2/x64/Debug/SDL2.elf
 
-      - name: Upload sample build outputs
+      - name: Upload project probe ELF
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: openorbis-sdl2-smoke-build
-          path: |
-            _openorbis-toolchain/samples/SDL2/SDL2/x64/Debug/SDL2.elf
+          name: ppsspp-ps4-sdl2-probe-elf
+          path: _openorbis-toolchain/samples/SDL2/SDL2/x64/Debug/SDL2.elf
           if-no-files-found: warn
           retention-days: 7
