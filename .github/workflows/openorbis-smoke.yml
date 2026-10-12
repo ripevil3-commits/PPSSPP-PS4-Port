@@ -24,6 +24,9 @@ jobs:
 
       - name: Build and package the upstream SDL2 sample with the official OpenOrbis container
         run: |
+          # The current sample uses a sysmodule enum absent from the container's SDK headers.
+          # Keep the documented PS4 module ID (0x009A) while building against that SDK.
+          sed -i 's/ORBIS_SYSMODULE_FREETYPE_OL/0x009A/g' _openorbis-toolchain/samples/SDL2/SDL2/main.cpp
           docker run --rm \
             --volume "${{ github.workspace }}/_openorbis-toolchain:/workspace" \
             --workdir /workspace/samples/SDL2 \
