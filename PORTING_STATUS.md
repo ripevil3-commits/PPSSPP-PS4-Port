@@ -10,10 +10,13 @@ This repository is an experimental porting investigation. It is not an official 
 - [x] Add an OpenOrbis CI smoke build.
 - [x] Confirm that the OpenOrbis container can compile and link a PS4 ELF.
 - [x] Add a project-owned minimal SDL2 probe source.
-- [x] Confirm the latest CI run compiles and links the project-owned probe (GitHub Actions run #18 passed on commit `b0403476d93fb2fc4bf779ac6086e8ad330044a2`).
+- [x] Audit upstream PPSSPP v1.20.4 source layout and C++17 configuration.
+- [x] Add exploratory syntax-only checks for selected upstream PPSSPP translation units.
+- [x] Confirm that `LogManager.cpp`, `Base64.cpp`, `Utf8.cpp`, `JSONReader.cpp`, and `Path.cpp` pass the current OpenOrbis compiler syntax-only probe (CI run #33).
+- [ ] Resolve OpenOrbis SDK `isfinite` macro collision reported by `JSONWriter.cpp`.
+- [ ] Add a PS4-specific PPSSPP CMake target and compile/link actual PPSSPP objects, not only syntax-only probes.
 - [ ] Restore packaging tools or provide a supported packaging environment for SELF/PKG generation.
-- [ ] Validate the probe on a compatible PS4.
-- [ ] Add a PS4-specific PPSSPP CMake target and compile an upstream translation unit (see [upstream source audit](docs/upstream-source-audit.md)).
+- [ ] Validate a runnable build on a compatible PS4.
 - [ ] Map PPSSPP's platform services to available PS4 APIs/libraries.
 - [ ] Select and validate a graphics path before attempting the full emulator.
 - [ ] Investigate audio, controller input, filesystem, threading, JIT/code generation, and third-party dependencies.
@@ -23,7 +26,9 @@ This repository is an experimental porting investigation. It is not an official 
 
 The workflow builds `ps4-smoke/main.cpp`, a small SDL2 program maintained in this repository, using the OpenOrbis sample's compiler and link configuration. It checks for a linked ELF and uploads it as a short-lived Actions artifact.
 
-This is a **compile/link probe only**. It does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
+A separate exploratory syntax-only pass checks a handful of upstream PPSSPP translation units. Five of six currently pass; `JSONWriter.cpp` hits an `isfinite` macro collision from the OpenOrbis SDK's `math.h`. This is useful compatibility evidence, but syntax-only checks do not link PPSSPP or prove the whole project builds.
+
+This is **not a PPSSPP build**. CI does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
 
 ## Why the full port is non-trivial
 
