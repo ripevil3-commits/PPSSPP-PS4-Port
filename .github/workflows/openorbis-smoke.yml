@@ -39,9 +39,6 @@ jobs:
         with:
           name: openorbis-sdl2-smoke-build
           path: |
-            _openorbis-toolchain/samples/SDL2/eboot.bin
-            _openorbis-toolchain/samples/SDL2/*.pkg
-            _openorbis-toolchain/samples/SDL2/x64/Debug/*.elf
-            _openorbis-toolchain/samples/SDL2/x64/Debug/*.oelf
+            _openorbis-toolchain/samples/SDL2/SDL2/x64/Debug/SDL2.elf
           if-no-files-found: warn
           retention-days: 7
