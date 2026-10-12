@@ -6,7 +6,7 @@ This repository tracks experimental work toward porting PPSSPP to a homebrew app
 
 - [x] Set up an OpenOrbis compile/link smoke workflow.
 - [x] Add a project-owned minimal SDL2 probe in `ps4-smoke/main.cpp`.
-- [ ] Confirm the new probe build passes in GitHub Actions.
+- [x] Confirm the SDL2 probe compile/link build passes in GitHub Actions.
 - [ ] Establish a reproducible ELF-to-SELF/PKG packaging environment.
 - [ ] Test the probe on compatible PS4 hardware.
 - [ ] Port PPSSPP's platform, graphics, audio, input, filesystem, threading, and JIT/dependency layers.
