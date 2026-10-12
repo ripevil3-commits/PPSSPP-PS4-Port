@@ -19,14 +19,13 @@ jobs:
       - name: Fetch the upstream OpenOrbis sample source
         run: git clone --depth 1 https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git _openorbis-toolchain
 
-      - name: Build and package the upstream SDL2 sample with OpenOrbis
-        uses: OpenOrbis/toolchain-action@main
-        with:
-          version: v0.5.4
-          command: |
-            cd _openorbis-toolchain/samples/SDL2
-            make clean
-            make
+      - name: Build and package the upstream SDL2 sample with the official OpenOrbis container
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}/_openorbis-toolchain:/workspace" \
+            --workdir /workspace/samples/SDL2 \
+            openorbisofficial/toolchain:latest \
+            bash -lc 'make clean && make'
 
       - name: Upload sample build outputs
         if: always()
