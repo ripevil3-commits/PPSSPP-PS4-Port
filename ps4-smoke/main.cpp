@@ -1,7 +1,7 @@
 // Project-owned SDL2/PS4 toolchain probe.
 // This validates that code maintained in this repository can compile and link
 // against the OpenOrbis sample environment. It is not the PPSSPP frontend.
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 int main(int, char **) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
