@@ -25,6 +25,9 @@ jobs:
       - name: Inventory upstream CMake assumptions that need PS4 adaptation
         run: bash scripts/audit-ps4-cmake-assumptions.sh _ppsspp-upstream/CMakeLists.txt
 
+      - name: Audit experimental OpenOrbis CMake toolchain starter
+        run: bash scripts/audit-ps4-toolchain-file.sh
+
       - name: Fetch the upstream OpenOrbis SDL2 build environment
         run: git clone --depth 1 https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git _openorbis-toolchain
 
