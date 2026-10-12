@@ -4,8 +4,10 @@ set -uo pipefail
 src="${1:-_ppsspp-upstream}"
 toolchain="${2:-_openorbis-toolchain}"
 log="${3:-upstream-translation-unit.log}"
+compat="$PWD/scripts/openorbis-ppsspp-compat.h"
 test -f "$src/Common/Log/LogManager.cpp" || { echo "::error::Upstream LogManager.cpp not found"; exit 1; }
 test -f "$toolchain/samples/SDL2/Makefile" || { echo "::error::OpenOrbis sample Makefile not found"; exit 1; }
+test -f "$compat" || { echo "::error::OpenOrbis compatibility shim not found"; exit 1; }
 
 # Exploratory syntax-only checks: these do not constitute a PPSSPP build.
 # Keep trying all candidates so one platform incompatibility doesn't hide others.
@@ -26,9 +28,10 @@ do
   docker run --rm \
     --volume "$PWD/$src:/ppsspp:ro" \
     --volume "$PWD/$toolchain:/workspace" \
+    --volume "$compat:/compat.h:ro" \
     --workdir /workspace/samples/SDL2 \
     openorbisofficial/toolchain:latest \
-    bash -lc "clang++ --target=x86_64-pc-freebsd12-elf -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -std=c++17 -fPIC -fsyntax-only -isysroot \"\$OO_PS4_TOOLCHAIN\" -isystem \"\$OO_PS4_TOOLCHAIN/include\" -isystem \"\$OO_PS4_TOOLCHAIN/include/c++/v1\" -I/ppsspp -I/ppsspp/Common /ppsspp/$unit" 2>&1 | tee -a "$log"
+    bash -lc "clang++ --target=x86_64-pc-freebsd12-elf -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -std=c++17 -fPIC -fsyntax-only -include /compat.h -isysroot \"\$OO_PS4_TOOLCHAIN\" -isystem \"\$OO_PS4_TOOLCHAIN/include\" -isystem \"\$OO_PS4_TOOLCHAIN/include/c++/v1\" -I/ppsspp -I/ppsspp/Common /ppsspp/$unit" 2>&1 | tee -a "$log"
   result=${PIPESTATUS[0]}
   set -e
   if [[ "$result" -eq 0 ]]; then
