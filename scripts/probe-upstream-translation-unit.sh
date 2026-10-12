@@ -15,8 +15,10 @@ for unit in \
   Common/Log/LogManager.cpp \
   Common/Data/Encoding/Base64.cpp \
   Common/Data/Encoding/Utf8.cpp \
+  Common/Data/Format/IniFile.cpp \
   Common/Data/Format/JSONWriter.cpp \
   Common/Data/Format/JSONReader.cpp \
+  Common/Data/Format/RIFF.cpp \
   Common/File/Path.cpp
 do
   echo "===== $unit =====" | tee -a "$log"
@@ -40,6 +42,6 @@ done
 if [[ "$overall" -eq 0 ]]; then
   echo "PASS: all exploratory upstream translation units passed syntax-only compilation."
 else
-  echo "::warning::One or more exploratory upstream translation units failed. See uploaded log for diagnostics."
+  echo "::warning::One or more exploratory translation units failed. See uploaded log for diagnostics."
 fi
 exit 0
