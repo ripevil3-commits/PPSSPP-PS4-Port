@@ -13,6 +13,7 @@ This repository is an experimental porting investigation. It is not an official 
 - [x] Confirm the latest CI run compiles and links the project-owned probe (GitHub Actions run #18 passed on commit `b0403476d93fb2fc4bf779ac6086e8ad330044a2`).
 - [ ] Restore packaging tools or provide a supported packaging environment for SELF/PKG generation.
 - [ ] Validate the probe on a compatible PS4.
+- [ ] Add a PS4-specific PPSSPP CMake target and compile an upstream translation unit (see [upstream source audit](docs/upstream-source-audit.md)).
 - [ ] Map PPSSPP's platform services to available PS4 APIs/libraries.
 - [ ] Select and validate a graphics path before attempting the full emulator.
 - [ ] Investigate audio, controller input, filesystem, threading, JIT/code generation, and third-party dependencies.
