@@ -10,7 +10,7 @@ This repository is an experimental porting investigation. It is not an official 
 - [x] Add an OpenOrbis CI smoke build.
 - [x] Confirm that the OpenOrbis container can compile and link a PS4 ELF.
 - [x] Add a project-owned minimal SDL2 probe source.
-- [ ] Confirm the latest CI run compiles and links the project-owned probe.
+- [x] Confirm the latest CI run compiles and links the project-owned probe (GitHub Actions run #18 passed on commit `b0403476d93fb2fc4bf779ac6086e8ad330044a2`).
 - [ ] Restore packaging tools or provide a supported packaging environment for SELF/PKG generation.
 - [ ] Validate the probe on a compatible PS4.
 - [ ] Map PPSSPP's platform services to available PS4 APIs/libraries.
