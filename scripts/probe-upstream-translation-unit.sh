@@ -13,7 +13,7 @@ overall=0
 : > "$log"
 for unit in \
   Common/Log/LogManager.cpp \
-  Common/Math/Statistics.cpp \
+  Common/Serialize/Serializer.cpp \
   Common/Data/Format/JSONReader.cpp \
   Common/File/Path.cpp
 do
