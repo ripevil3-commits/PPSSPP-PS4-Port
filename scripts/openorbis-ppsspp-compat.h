@@ -3,6 +3,7 @@
 // std:: declarations. Remove conflicting macros and provide narrow C++ wrappers
 // for both libc++ and upstream call sites. This is not a production compatibility
 // layer for a full PPSSPP build.
+#include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
 #ifdef isfinite
