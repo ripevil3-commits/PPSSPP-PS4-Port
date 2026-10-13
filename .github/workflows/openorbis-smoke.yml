@@ -36,10 +36,8 @@ jobs:
 
       - name: Build this repository's SDL2 probe with the OpenOrbis container
         run: |
-          # Use our own minimal source rather than the upstream game sample.
           cp ps4-smoke/main.cpp _openorbis-toolchain/samples/SDL2/SDL2/main.cpp
           find _openorbis-toolchain/samples/SDL2/SDL2 -maxdepth 1 -type f -name '*.cpp' ! -name main.cpp -delete
-          # The published container image lacks create-fself; this is compile/link only.
           printf '\nsmoke-elf: $(OBJS)\n\t$(LD) $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)\n' >> _openorbis-toolchain/samples/SDL2/Makefile
           docker run --rm \
             --volume "${{ github.workspace }}/_openorbis-toolchain:/workspace" \
@@ -50,32 +48,41 @@ jobs:
       - name: Build a CMake-enabled OpenOrbis diagnostic image
         run: docker build -f .github/docker/ppsspp-openorbis-cmake.Dockerfile -t ppsspp-openorbis-cmake:ci .
 
-      - name: Attempt real upstream PPSSPP CMake configuration (diagnostic)
+      - name: Configure and attempt a real upstream PPSSPP build (diagnostic)
         continue-on-error: true
         run: |
+          mkdir -p _ppsspp-cmake-build
           set +e
           docker run --rm \
             --volume "${{ github.workspace }}/_ppsspp-upstream:/ppsspp:ro" \
             --volume "${{ github.workspace }}:/project" \
+            --volume "${{ github.workspace }}/_ppsspp-cmake-build:/build" \
             --workdir /project \
             ppsspp-openorbis-cmake:ci \
-            bash -lc 'cmake -S /ppsspp -B /tmp/ppsspp-openorbis-build \
-              -DCMAKE_TOOLCHAIN_FILE=/project/cmake/ps4-openorbis-toolchain.cmake \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DLIBRETRO=ON \
-              -DARM_NO_VULKAN=ON -DUSING_GLES2=ON \
-              -DUSE_FFMPEG=OFF -DUSE_DISCORD=OFF -DUSE_MINIUPNPC=OFF \
-              -DUSE_SYSTEM_LIBSDL2=OFF -DUSE_SYSTEM_LIBPNG=OFF' 2>&1 | tee ppsspp-cmake-configure.log
-          result=${PIPESTATUS[0]}
-          echo "CMAKE_CONFIGURE_EXIT=$result" | tee -a ppsspp-cmake-configure.log
+            bash -lc '
+              cmake -S /ppsspp -B /build \
+                -DCMAKE_TOOLCHAIN_FILE=/project/cmake/ps4-openorbis-toolchain.cmake \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DLIBRETRO=ON \
+                -DARM_NO_VULKAN=ON -DUSING_GLES2=ON \
+                -DUSE_FFMPEG=OFF -DUSE_DISCORD=OFF -DUSE_MINIUPNPC=OFF \
+                -DUSE_SYSTEM_LIBSDL2=OFF -DUSE_SYSTEM_LIBPNG=OFF
+              configure_result=$?
+              echo "CMAKE_CONFIGURE_EXIT=$configure_result"
+              if [ "$configure_result" -eq 0 ]; then
+                cmake --build /build --parallel 2
+                echo "CMAKE_BUILD_EXIT=$?"
+              fi
+            ' > ppsspp-cmake-build.log 2>&1
+          cat ppsspp-cmake-build.log
           exit 0
 
-      - name: Upload upstream CMake configure diagnostics
+      - name: Upload upstream CMake configure and build diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ppsspp-openorbis-cmake-configure-diagnostics
-          path: ppsspp-cmake-configure.log
+          name: ppsspp-openorbis-cmake-build-diagnostics
+          path: ppsspp-cmake-build.log
           if-no-files-found: warn
           retention-days: 7
 
