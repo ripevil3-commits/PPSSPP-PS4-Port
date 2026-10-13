@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fetch the pinned upstream PPSSPP source for a source-layout audit
-        run: git clone --depth 1 --branch v1.20.4 https://github.com/hrydgard/ppsspp.git _ppsspp-upstream
+        run: git clone --depth 1 --branch v1.20.4 --recurse-submodules --shallow-submodules https://github.com/hrydgard/ppsspp.git _ppsspp-upstream
 
       - name: Audit upstream PPSSPP source layout and C++ standard
         run: bash scripts/audit-ppsspp-source.sh _ppsspp-upstream
