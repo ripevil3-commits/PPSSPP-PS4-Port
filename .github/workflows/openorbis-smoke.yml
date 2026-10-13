@@ -52,6 +52,9 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p _ppsspp-cmake-build
+          # The container runs as the unprivileged `orbis` user, so make the host-mounted
+          # build directory writable before CMake creates its cache and compiler probes.
+          chmod a+rwx _ppsspp-cmake-build
           set +e
           docker run --rm \
             --volume "${{ github.workspace }}/_ppsspp-upstream:/ppsspp:ro" \
