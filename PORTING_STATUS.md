@@ -36,6 +36,9 @@ The CMake-enabled diagnostic container includes CMake, Make, binutils, and Pytho
 
 The latest diagnostic build (#67) confirms the math-predicate shim now gets past the previous `isinf`/`isnan` blocker; compilation again reaches armips at about 24%. The current failure is `ghc::filesystem` not recognizing the SDK's FreeBSD-derived target because `BSD` is not exposed by its headers. The experimental C++ flags now define `BSD=199506` so armips can select its existing BSD/POSIX implementation. This is a targeted hypothesis, not yet validated; the next CI run must confirm it does not introduce new compatibility errors.
 
+
+CI run #68 validated the `BSD=199506` experiment: armips now compiles and links successfully, and the overall build advanced to about 31%. The next blocker is in glslang, where upstream calls `std::isinf` and `std::isnan` but the OpenOrbis libc++ headers do not declare those functions after the SDK macros are removed. The compatibility shim now adds corresponding `std` wrappers as well as the global wrappers needed by libc++; CI must verify the fix. This is still an incomplete diagnostic build, not a runnable emulator.
+
 An experimental CMake toolchain starter is at `cmake/ps4-openorbis-toolchain.cmake`. CI checks its required cross-compilation settings. Successful CMake configuration is only an initial milestone: it does not mean PPSSPP compiles, links, runs, or has a working PS4 graphics backend.
 
 This is **not a PPSSPP build yet**. CI does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
