@@ -35,7 +35,7 @@ set(CMAKE_CXX_COMPILER_TARGET x86_64-pc-freebsd12-elf)
 set(CMAKE_SYSROOT "${OO_PS4_TOOLCHAIN}")
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-set(CMAKE_C_FLAGS_INIT "-fPIC -funwind-tables -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -isystem ${OO_PS4_TOOLCHAIN}/include")
+set(CMAKE_C_FLAGS_INIT "-fPIC -funwind-tables -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -isystem ${OO_PS4_TOOLCHAIN}/include -I/sdk-source/include -isystem /sdk-source/include")
 # OpenOrbis targets a FreeBSD-derived ABI, but this SDK's sys/param.h does not
 # expose BSD for ghc::filesystem's OS detection. Define BSD only for C++ so
 # armips can select its existing BSD/POSIX implementation; CI must validate it.
