@@ -29,9 +29,9 @@ The workflow builds `ps4-smoke/main.cpp`, a small SDL2 program maintained in thi
 
 A separate exploratory syntax-only pass checks eight upstream PPSSPP translation units. All eight passed in CI run #37 with an exploratory compatibility shim for the OpenOrbis `isfinite` issue. This is useful compatibility evidence, but syntax-only checks do not link PPSSPP or prove the whole project builds.
 
-The CMake-enabled container now includes CMake, Make, and binutils. The next configure attempt successfully identified `/usr/bin/clang` and `/usr/bin/clang++` and progressed into upstream CMake setup, where it exposed missing PPSSPP git submodules (`armips`, `glslang`, and `cpu_features`) because the source checkout had not fetched them. The workflow now clones the pinned source with `--recurse-submodules --shallow-submodules`; CI will check whether this advances configuration further. The configure step remains diagnostic and is allowed to fail while blockers are being identified.
+The CMake-enabled container includes CMake, Make, binutils, and Python 3 for host-side configure steps. In CI run #54, compiler identification and compiler checks succeeded and configuration reached the upstream `glslang` dependency, then stopped because the container lacked a Python 3 interpreter discoverable by CMake. The container recipe now installs `python3`; the next run will reveal the next configuration blocker. The configure step remains diagnostic and is allowed to fail while blockers are being identified.
 
-An experimental CMake toolchain starter is now at `cmake/ps4-openorbis-toolchain.cmake`. CI checks its required cross-compilation settings. It is only a starting point: it has not yet configured or built PPSSPP, and desktop graphics/platform dependencies remain unresolved.
+An experimental CMake toolchain starter is at `cmake/ps4-openorbis-toolchain.cmake`. CI checks its required cross-compilation settings. It is only a starting point: it has not yet configured or built PPSSPP, and desktop graphics/platform dependencies remain unresolved.
 
 This is **not a PPSSPP build**. CI does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
 
