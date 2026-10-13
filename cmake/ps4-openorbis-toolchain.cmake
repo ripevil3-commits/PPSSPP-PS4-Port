@@ -39,7 +39,7 @@ set(CMAKE_C_FLAGS_INIT "-fPIC -funwind-tables -D_GNU_SOURCE -D_POSIX_C_SOURCE=20
 # OpenOrbis targets a FreeBSD-derived ABI, but this SDK's sys/param.h does not
 # expose BSD for ghc::filesystem's OS detection. Define BSD only for C++ so
 # armips can select its existing BSD/POSIX implementation; CI must validate it.
-set(CMAKE_CXX_FLAGS_INIT "-fPIC -funwind-tables -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -DBSD=199506 -std=c++17 -include /project/scripts/openorbis-ppsspp-compat.h -isystem ${OO_PS4_TOOLCHAIN}/include -isystem ${OO_PS4_TOOLCHAIN}/include/c++/v1")
+set(CMAKE_CXX_FLAGS_INIT "-fPIC -funwind-tables -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -DBSD=199506 -std=c++17 -include /project/scripts/openorbis-ppsspp-compat.h -isystem ${OO_PS4_TOOLCHAIN}/include -isystem /sdk-source/include -isystem ${OO_PS4_TOOLCHAIN}/include/c++/v1")
 
 # PPSSPP's upstream CMakeLists enables some desktop Unix graphics integrations
 # automatically. Keep this toolchain file honest: it does not silently claim
