@@ -14,6 +14,10 @@
 #ifdef isnan
 #undef isnan
 #endif
+inline int isfinite(double value) { return __builtin_isfinite(value); }
+inline int isinf(double value) { return __builtin_isinf(value); }
+inline int isnan(double value) { return __builtin_isnan(value); }
+
 namespace std {
 inline bool isfinite(double value) {
 	return __builtin_isfinite(value);
