@@ -63,8 +63,7 @@ jobs:
               -DCMAKE_TOOLCHAIN_FILE=/project/cmake/ps4-openorbis-toolchain.cmake \
               -DCMAKE_BUILD_TYPE=Release \
               -DLIBRETRO=ON \
-              -DARM_NO_VULKAN=ON \
-              -DOPENGL_LIBRARIES=PS4_GRAPHICS_BACKEND_PENDING \
+              -DARM_NO_VULKAN=ON -DUSING_GLES2=ON \
               -DUSE_FFMPEG=OFF -DUSE_DISCORD=OFF -DUSE_MINIUPNPC=OFF \
               -DUSE_SYSTEM_LIBSDL2=OFF -DUSE_SYSTEM_LIBPNG=OFF' 2>&1 | tee ppsspp-cmake-configure.log
           result=${PIPESTATUS[0]}
