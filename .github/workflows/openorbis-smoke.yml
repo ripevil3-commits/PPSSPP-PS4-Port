@@ -50,10 +50,7 @@ jobs:
 
       - name: Verify OpenOrbis source GLES2 headers are mounted in diagnostic container
         run: |
-          docker run --rm \\
-            --volume "${{ github.workspace }}/_openorbis-toolchain:/sdk-source:ro" \\
-            ppsspp-openorbis-cmake:ci \\
-            bash -lc 'test -s /sdk-source/include/GLES2/gl2.h && echo "OPENORBIS_GLES2_HEADER_PRESENT=/sdk-source/include/GLES2/gl2.h"'
+          docker run --rm --volume "${{ github.workspace }}/_openorbis-toolchain:/sdk-source:ro" ppsspp-openorbis-cmake:ci bash -lc 'test -s /sdk-source/include/GLES2/gl2.h && echo "OPENORBIS_GLES2_HEADER_PRESENT=/sdk-source/include/GLES2/gl2.h"'
 
       - name: Configure and attempt a real upstream PPSSPP build (diagnostic)
         continue-on-error: true
