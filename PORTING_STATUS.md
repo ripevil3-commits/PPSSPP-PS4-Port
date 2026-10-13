@@ -57,3 +57,6 @@ Respect upstream licenses and third-party notices when importing or modifying co
 
 
 CI run #70 confirmed that the `std::isinf`/`std::isnan` wrappers let glslang compile substantially further; the build reached about 44%. The next blocker is another OpenOrbis `math.h` macro collision: `signbit` expands inside `std::signbit` in `Common/Arm64Emitter.cpp`. The exploratory compatibility shim now removes the `signbit` macro and supplies global and `std::` wrappers using the compiler builtin. This needs confirmation in the next CI run and remains a diagnostic-only workaround, not a production-ready SDK compatibility layer.
+
+
+CI run #72 confirms the `signbit` macro workaround passed: `glslang` built successfully and the overall compilation reached about 50%. The next failure is an OpenOrbis socket header using `uint8_t` before it is declared. The compatibility shim now includes `<stdint.h>` early so the SDK socket header can see the fixed-width integer types; run #74 will test this targeted fix. These percentages are the CMake build's reported progress before the first blocking error, not a percentage of a finished, runnable PS4 port.
