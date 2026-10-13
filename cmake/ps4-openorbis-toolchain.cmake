@@ -12,8 +12,8 @@ set(OO_PS4_TOOLCHAIN "$ENV{OO_PS4_TOOLCHAIN}" CACHE PATH "OpenOrbis PS4 SDK root
 set(CMAKE_SYSTEM_NAME FreeBSD)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-set(CMAKE_C_COMPILER clang-12)
-set(CMAKE_CXX_COMPILER clang++-12)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
 
 # CMake did not infer the archive utility from the OpenOrbis cross target.
 # Resolve the LLVM binutils explicitly so its compiler sanity check can create
