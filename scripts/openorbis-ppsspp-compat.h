@@ -8,6 +8,12 @@
 #ifdef isfinite
 #undef isfinite
 #endif
+#ifdef isinf
+#undef isinf
+#endif
+#ifdef isnan
+#undef isnan
+#endif
 namespace std {
 inline bool isfinite(double value) {
 	return __builtin_isfinite(value);
