@@ -54,3 +54,6 @@ PPSSPP is a large cross-platform C++ project. A PS4 port needs more than changin
 - OpenOrbis GitHub Actions helper: https://github.com/OpenOrbis/toolchain-action
 
 Respect upstream licenses and third-party notices when importing or modifying code.
+
+
+CI run #70 confirmed that the `std::isinf`/`std::isnan` wrappers let glslang compile substantially further; the build reached about 44%. The next blocker is another OpenOrbis `math.h` macro collision: `signbit` expands inside `std::signbit` in `Common/Arm64Emitter.cpp`. The exploratory compatibility shim now removes the `signbit` macro and supplies global and `std::` wrappers using the compiler builtin. This needs confirmation in the next CI run and remains a diagnostic-only workaround, not a production-ready SDK compatibility layer.
