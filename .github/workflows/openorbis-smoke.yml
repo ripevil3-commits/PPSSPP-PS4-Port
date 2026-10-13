@@ -47,6 +47,39 @@ jobs:
             openorbisofficial/toolchain:latest \
             bash -lc 'make clean && make smoke-elf'
 
+      - name: Build a CMake-enabled OpenOrbis diagnostic image
+        run: docker build -f .github/docker/ppsspp-openorbis-cmake.Dockerfile -t ppsspp-openorbis-cmake:ci .
+
+      - name: Attempt real upstream PPSSPP CMake configuration (diagnostic)
+        continue-on-error: true
+        run: |
+          set +e
+          docker run --rm \
+            --volume "${{ github.workspace }}/_ppsspp-upstream:/ppsspp:ro" \
+            --volume "${{ github.workspace }}:/project" \
+            --workdir /project \
+            ppsspp-openorbis-cmake:ci \
+            bash -lc 'cmake -S /ppsspp -B /tmp/ppsspp-openorbis-build \
+              -DCMAKE_TOOLCHAIN_FILE=/project/cmake/ps4-openorbis-toolchain.cmake \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DLIBRETRO=ON \
+              -DARM_NO_VULKAN=ON \
+              -DOPENGL_LIBRARIES=PS4_GRAPHICS_BACKEND_PENDING \
+              -DUSE_FFMPEG=OFF -DUSE_DISCORD=OFF -DUSE_MINIUPNPC=OFF \
+              -DUSE_SYSTEM_LIBSDL2=OFF -DUSE_SYSTEM_LIBPNG=OFF' 2>&1 | tee ppsspp-cmake-configure.log
+          result=${PIPESTATUS[0]}
+          echo "CMAKE_CONFIGURE_EXIT=$result" | tee -a ppsspp-cmake-configure.log
+          exit 0
+
+      - name: Upload upstream CMake configure diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ppsspp-openorbis-cmake-configure-diagnostics
+          path: ppsspp-cmake-configure.log
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Attempt syntax-only compile of an upstream PPSSPP translation unit
         continue-on-error: true
         run: bash scripts/probe-upstream-translation-unit.sh _ppsspp-upstream _openorbis-toolchain upstream-translation-unit.log
