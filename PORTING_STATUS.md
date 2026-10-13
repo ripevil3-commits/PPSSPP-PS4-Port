@@ -29,7 +29,7 @@ The workflow builds `ps4-smoke/main.cpp`, a small SDL2 program maintained in thi
 
 A separate exploratory syntax-only pass checks eight upstream PPSSPP translation units. All eight passed in CI run #37 with an exploratory compatibility shim for the OpenOrbis `isfinite` issue. This is useful compatibility evidence, but syntax-only checks do not link PPSSPP or prove the whole project builds.
 
-The first CMake-enabled container now includes CMake, Make, and binutils, but the latest real configure attempt still stops before project configuration because `clang-12`/`clang++-12` are not present under those names in the image. The toolchain starter was adjusted to use `clang`/`clang++`; the next CI run will verify whether that gets past compiler discovery. The configure step is diagnostic and allowed to fail while blockers are being identified.
+The CMake-enabled container now includes CMake, Make, and binutils. The next configure attempt successfully identified `/usr/bin/clang` and `/usr/bin/clang++` and progressed into upstream CMake setup, where it exposed missing PPSSPP git submodules (`armips`, `glslang`, and `cpu_features`) because the source checkout had not fetched them. The workflow now clones the pinned source with `--recurse-submodules --shallow-submodules`; CI will check whether this advances configuration further. The configure step remains diagnostic and is allowed to fail while blockers are being identified.
 
 An experimental CMake toolchain starter is now at `cmake/ps4-openorbis-toolchain.cmake`. CI checks its required cross-compilation settings. It is only a starting point: it has not yet configured or built PPSSPP, and desktop graphics/platform dependencies remain unresolved.
 
