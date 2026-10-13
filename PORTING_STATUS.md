@@ -15,6 +15,8 @@ This repository is an experimental porting investigation. It is not an official 
 - [x] Confirm that eight selected upstream translation units pass the current OpenOrbis compiler syntax-only probe (CI run #37).
 - [x] Add an exploratory compatibility shim that resolves the `JSONWriter.cpp` `isfinite` syntax issue in the probe (CI run #37); production integration still needs review.
 - [x] Add an experimental OpenOrbis CMake toolchain starter and CI static audit for its key cross-compile settings.
+- [x] Get upstream PPSSPP CMake configuration to complete in the diagnostic container (CI run #55).
+- [ ] Compile/link actual PPSSPP targets with the experimental toolchain.
 - [ ] Add a PS4-specific PPSSPP CMake target and compile/link actual PPSSPP objects, not only syntax-only probes.
 - [ ] Restore packaging tools or provide a supported packaging environment for SELF/PKG generation.
 - [ ] Validate a runnable build on a compatible PS4.
@@ -29,11 +31,11 @@ The workflow builds `ps4-smoke/main.cpp`, a small SDL2 program maintained in thi
 
 A separate exploratory syntax-only pass checks eight upstream PPSSPP translation units. All eight passed in CI run #37 with an exploratory compatibility shim for the OpenOrbis `isfinite` issue. This is useful compatibility evidence, but syntax-only checks do not link PPSSPP or prove the whole project builds.
 
-The CMake-enabled container includes CMake, Make, binutils, and Python 3 for host-side configure steps. In CI run #54, compiler identification and compiler checks succeeded and configuration reached the upstream `glslang` dependency, then stopped because the container lacked a Python 3 interpreter discoverable by CMake. The container recipe now installs `python3`; the next run will reveal the next configuration blocker. The configure step remains diagnostic and is allowed to fail while blockers are being identified.
+The CMake-enabled diagnostic container includes CMake, Make, binutils, and Python 3 for host-side configure steps. In CI run #55, PPSSPP's CMake configuration completed successfully after Python 3 was added. CMake reported optional or platform-specific dependencies such as Snappy, X11, ZLIB, and LIBZIP missing; configuration still generated build files. The workflow now attempts an actual build immediately after configuration and uploads the build log, so the next run should identify the first compile or link blocker. This diagnostic is allowed to fail while blockers are being identified.
 
-An experimental CMake toolchain starter is at `cmake/ps4-openorbis-toolchain.cmake`. CI checks its required cross-compilation settings. It is only a starting point: it has not yet configured or built PPSSPP, and desktop graphics/platform dependencies remain unresolved.
+An experimental CMake toolchain starter is at `cmake/ps4-openorbis-toolchain.cmake`. CI checks its required cross-compilation settings. Successful CMake configuration is only an initial milestone: it does not mean PPSSPP compiles, links, runs, or has a working PS4 graphics backend.
 
-This is **not a PPSSPP build**. CI does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
+This is **not a PPSSPP build yet**. CI does not currently create an ELF-to-SELF conversion, a PKG, or a runnable install package. The CI container used so far did not include `create-fself`, so packaging remains a separate blocker. An ELF artifact is not proof of successful execution on PS4 hardware.
 
 ## Why the full port is non-trivial
 
