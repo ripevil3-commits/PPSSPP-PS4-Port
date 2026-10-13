@@ -60,6 +60,7 @@ jobs:
             --volume "${{ github.workspace }}/_ppsspp-upstream:/ppsspp:ro" \
             --volume "${{ github.workspace }}:/project" \
             --volume "${{ github.workspace }}/_ppsspp-cmake-build:/build" \
+            --volume "${{ github.workspace }}/_openorbis-toolchain:/sdk-source:ro" \
             --workdir /project \
             ppsspp-openorbis-cmake:ci \
             bash -lc '
