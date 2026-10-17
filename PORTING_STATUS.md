@@ -70,3 +70,7 @@ CI runs #79–#81 confirm the source-checkout include path alone did not resolve
 
 
 Follow-up diagnosis after run #86: the missing GLES2 include is first reported while compiling `Common/GPU/OpenGL/gl3stub.c`, a C translation unit. The exploratory toolchain had added `/sdk-source/include` only to `CMAKE_CXX_FLAGS_INIT`, not `CMAKE_C_FLAGS_INIT`, so the header path was not consistently available to C compilation. Added the same source-header include paths to the C flags. This is a targeted hypothesis based on the failing translation unit; the next CI build must confirm whether it resolves the error.
+
+## DolphinPS4 reference review (2026-10-17)
+
+Reviewed the DolphinPS4 README, BUILDING.md, and PS4 CMake toolchain. Added [docs/DOLPHINPS4_REFERENCE.md](docs/DOLPHINPS4_REFERENCE.md) with transferable build lessons and a PPSSPP-specific follow-up checklist. The useful patterns are a separate target sysroot/runtime, explicit cross-toolchain and link configuration, small hardware/API probes, pinned upstream revisions, and a separately verified packaging pipeline. Dolphin's Mesa/RADV/GNM graphics implementation is not a drop-in PPSSPP backend. This reference review does not itself change the build status: the actual PPSSPP compile and PS4 runtime remain unverified until CI and hardware tests confirm them.
