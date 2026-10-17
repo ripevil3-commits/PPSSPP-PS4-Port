@@ -85,6 +85,31 @@ jobs:
           cat ppsspp-cmake-build.log
           exit 0
 
+      - name: Summarize the real PPSSPP build result
+        if: always()
+        run: |
+          {
+            echo "## Upstream PPSSPP / OpenOrbis build diagnostic"
+            echo
+            if [ -f ppsspp-cmake-build.log ]; then
+              configure_result=$(grep -Eo 'CMAKE_CONFIGURE_EXIT=-?[0-9]+' ppsspp-cmake-build.log | tail -n 1 | cut -d= -f2 || true)
+              build_result=$(grep -Eo 'CMAKE_BUILD_EXIT=-?[0-9]+' ppsspp-cmake-build.log | tail -n 1 | cut -d= -f2 || true)
+              echo "- CMake configure exit: ${configure_result:-not recorded}"
+              echo "- CMake build exit: ${build_result:-not recorded}"
+              echo
+              echo "First compiler/build errors:"
+              echo '~~~text'
+              grep -n -m 8 -E 'fatal error:|error:|Error [0-9]+|FAILED:' ppsspp-cmake-build.log || echo "No matching error lines found; inspect the uploaded full log."
+              echo '~~~'
+              if [ "${configure_result:-}" != "0" ] || [ "${build_result:-}" != "0" ]; then
+                echo
+                echo "> **Important:** this diagnostic is not a successful PPSSPP port build. The full log is attached as a workflow artifact."
+              fi
+            else
+              echo "Build log was not generated. Inspect earlier workflow steps."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload upstream CMake configure and build diagnostics
         if: always()
         uses: actions/upload-artifact@v4
