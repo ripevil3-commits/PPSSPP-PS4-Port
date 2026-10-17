@@ -6,6 +6,18 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
+
+// BSD-derived ioctl request constants such as FIONREAD are commonly declared
+// by sys/filio.h rather than sys/ioctl.h. Include whichever headers this SDK
+// actually provides; do not hard-code an ABI-specific ioctl number.
+#if defined(__has_include)
+#if __has_include(<sys/ioctl.h>)
+#include <sys/ioctl.h>
+#endif
+#if __has_include(<sys/filio.h>)
+#include <sys/filio.h>
+#endif
+#endif
 #ifdef isfinite
 #undef isfinite
 #endif
