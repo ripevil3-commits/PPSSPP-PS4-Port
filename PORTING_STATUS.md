@@ -71,6 +71,10 @@ CI runs #79–#81 confirm the source-checkout include path alone did not resolve
 
 Follow-up diagnosis after run #86: the missing GLES2 include is first reported while compiling `Common/GPU/OpenGL/gl3stub.c`, a C translation unit. The exploratory toolchain had added `/sdk-source/include` only to `CMAKE_CXX_FLAGS_INIT`, not `CMAKE_C_FLAGS_INIT`, so the header path was not consistently available to C compilation. Added the same source-header include paths to the C flags. This is a targeted hypothesis based on the failing translation unit; the next CI build must confirm whether it resolves the error.
 
+## Latest full-build diagnostic (CI run #92, 2026-10-17)
+
+The latest workflow run completed its probe steps and recorded a real upstream PPSSPP build attempt. CMake configuration succeeded (`CMAKE_CONFIGURE_EXIT=0`), but compilation failed with `Core/HLE/proAdhoc.cpp:1969:20: error: use of undeclared identifier 'FIONREAD'` and `CMAKE_BUILD_EXIT=2`. This is the current blocker. The workflow is green because this full-build diagnostic is deliberately marked `continue-on-error`; it must not be interpreted as a successful PPSSPP build. Next, inspect the OpenOrbis target's available socket/ioctl headers and add a narrowly scoped, SDK-correct compatibility fix rather than guessing an ioctl constant. No PPSSPP ELF/SELF/PKG or physical PS4 run has been produced.
+
 ## DolphinPS4 reference review (2026-10-17)
 
 Reviewed the DolphinPS4 README, BUILDING.md, and PS4 CMake toolchain. Added [docs/DOLPHINPS4_REFERENCE.md](docs/DOLPHINPS4_REFERENCE.md) with transferable build lessons and a PPSSPP-specific follow-up checklist. The useful patterns are a separate target sysroot/runtime, explicit cross-toolchain and link configuration, small hardware/API probes, pinned upstream revisions, and a separately verified packaging pipeline. Dolphin's Mesa/RADV/GNM graphics implementation is not a drop-in PPSSPP backend. This reference review does not itself change the build status: the actual PPSSPP compile and PS4 runtime remain unverified until CI and hardware tests confirm them.
