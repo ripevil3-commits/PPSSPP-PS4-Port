@@ -127,6 +127,16 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Report PPSSPP build failure accurately
+        if: always()
+        run: |
+          configure_result=$(grep -Eo 'CMAKE_CONFIGURE_EXIT=-?[0-9]+' ppsspp-cmake-build.log | tail -n 1 | cut -d= -f2 || true)
+          build_result=$(grep -Eo 'CMAKE_BUILD_EXIT=-?[0-9]+' ppsspp-cmake-build.log | tail -n 1 | cut -d= -f2 || true)
+          if [ "${configure_result:-}" != "0" ] || [ "${build_result:-}" != "0" ]; then
+            echo "::error::PPSSPP/OpenOrbis full build failed (configure=${configure_result:-not-recorded}, build=${build_result:-not-recorded}). SDL2 probe success does not mean PPSSPP built."
+            exit 1
+          fi
+
       - name: Attempt syntax-only compile of an upstream PPSSPP translation unit
         continue-on-error: true
         run: bash scripts/probe-upstream-translation-unit.sh _ppsspp-upstream _openorbis-toolchain upstream-translation-unit.log
