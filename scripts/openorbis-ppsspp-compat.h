@@ -9,7 +9,7 @@
 
 // BSD-derived ioctl request constants such as FIONREAD are commonly declared
 // by sys/filio.h rather than sys/ioctl.h. Include whichever headers this SDK
-// actually provides; do not hard-code an ABI-specific ioctl number.
+// actually provides.
 #if defined(__has_include)
 #if __has_include(<sys/ioctl.h>)
 #include <sys/ioctl.h>
@@ -17,18 +17,16 @@
 #if __has_include(<sys/filio.h>)
 #include <sys/filio.h>
 #endif
-#endif
-
-// FreeBSD's sys/filio.h defines FIONREAD as _IOR('f', 127, int).
-// Some OpenOrbis SDK header sets omit that convenience definition even though
-// the target uses a FreeBSD-derived ioctl ABI. Reuse the SDK's _IOR encoding
-// macro instead of embedding a raw ioctl number. This only activates when the
-// SDK did not define FIONREAD itself.
-#if defined(__has_include)
 #if __has_include(<sys/ioccom.h>)
 #include <sys/ioccom.h>
 #endif
 #endif
+
+// FreeBSD's sys/filio.h defines FIONREAD as _IOR('f', 127, int).
+// Some OpenOrbis SDK header sets omit this convenience definition. Reuse the
+// SDK's _IOR encoding macro rather than embedding a raw ioctl number. This
+// fallback is for the FreeBSD-derived target ABI and only activates if the
+// SDK did not define FIONREAD itself.
 #if !defined(FIONREAD) && defined(_IOR)
 #define FIONREAD _IOR('f', 127, int)
 #endif
