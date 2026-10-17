@@ -34,16 +34,24 @@ jobs:
       - name: Allow the container to write build outputs
         run: chmod -R a+rwX _openorbis-toolchain
 
+      - name: Build OpenOrbis create-fself packaging tool
+        run: |
+          git clone --depth 1 https://github.com/OpenOrbis/create-fself.git _create-fself
+          cd _create-fself/cmd/create-fself
+          go build -o "$GITHUB_WORKSPACE/_openorbis-toolchain/bin/linux/create-fself" -modfile=go-linux.mod
+          test -s "$GITHUB_WORKSPACE/_openorbis-toolchain/bin/linux/create-fself"
+          chmod +x "$GITHUB_WORKSPACE/_openorbis-toolchain/bin/linux/create-fself"
+
       - name: Build this repository's SDL2 probe with the OpenOrbis container
         run: |
           cp ps4-smoke/main.cpp _openorbis-toolchain/samples/SDL2/SDL2/main.cpp
           find _openorbis-toolchain/samples/SDL2/SDL2 -maxdepth 1 -type f -name '*.cpp' ! -name main.cpp -delete
           printf '\nsmoke-elf: $(OBJS)\n\t$(LD) $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)\n' >> _openorbis-toolchain/samples/SDL2/Makefile
-          docker run --rm \
+          docker run --rm --user root \
             --volume "${{ github.workspace }}/_openorbis-toolchain:/workspace" \
             --workdir /workspace/samples/SDL2 \
             openorbisofficial/toolchain:latest \
-            bash -lc 'make clean && make smoke-elf'
+            bash -lc 'cp /workspace/bin/linux/create-fself /lib/OpenOrbisSDK/bin/linux/create-fself && chmod +x /lib/OpenOrbisSDK/bin/linux/create-fself && make clean && make smoke-elf'
 
       - name: Build a CMake-enabled OpenOrbis diagnostic image
         run: docker build -f .github/docker/ppsspp-openorbis-cmake.Dockerfile -t ppsspp-openorbis-cmake:ci .
