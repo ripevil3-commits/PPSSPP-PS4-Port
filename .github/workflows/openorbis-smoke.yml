@@ -71,7 +71,7 @@ jobs:
               cmake -S /ppsspp -B /build \
                 -DCMAKE_TOOLCHAIN_FILE=/project/cmake/ps4-openorbis-toolchain.cmake \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DLIBRETRO=ON \
+                -DLIBRETRO=OFF \
                 -DARM_NO_VULKAN=ON -DUSING_GLES2=ON \
                 -DUSE_FFMPEG=OFF -DUSE_DISCORD=OFF -DUSE_MINIUPNPC=OFF \
                 -DUSE_SYSTEM_LIBSDL2=OFF -DUSE_SYSTEM_LIBPNG=OFF
